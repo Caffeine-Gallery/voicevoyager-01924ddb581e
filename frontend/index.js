@@ -1,11 +1,55 @@
+import { AuthClient } from "@dfinity/auth-client";
 import { backend } from 'declarations/backend';
 
 const inputText = document.getElementById('inputText');
 const targetLang = document.getElementById('targetLang');
 const outputText = document.getElementById('outputText');
 const speakButton = document.getElementById('speakButton');
+const loginButton = document.getElementById('loginButton');
+const logoutButton = document.getElementById('logoutButton');
+const userSection = document.getElementById('userSection');
 
+let authClient;
 let translationTimeout;
+
+async function initAuth() {
+    authClient = await AuthClient.create();
+    if (await authClient.isAuthenticated()) {
+        handleAuthenticated();
+    }
+}
+
+async function handleAuthenticated() {
+    loginButton.style.display = 'none';
+    logoutButton.style.display = 'inline-block';
+    const identity = authClient.getIdentity();
+    const principal = identity.getPrincipal().toString();
+    userSection.innerText = `Logged in as: ${principal}`;
+    updateGreeting();
+}
+
+loginButton.onclick = async () => {
+    authClient.login({
+        identityProvider: "https://identity.ic0.app/#authorize",
+        onSuccess: handleAuthenticated,
+    });
+};
+
+logoutButton.onclick = async () => {
+    await authClient.logout();
+    loginButton.style.display = 'inline-block';
+    logoutButton.style.display = 'none';
+    userSection.innerText = '';
+};
+
+async function updateGreeting() {
+    try {
+        const greeting = await backend.greet();
+        console.log(greeting);
+    } catch (error) {
+        console.error('Error fetching greeting:', error);
+    }
+}
 
 async function translateText() {
     const text = inputText.value;
@@ -45,7 +89,6 @@ speakButton.addEventListener('click', () => {
     speechSynthesis.speak(utterance);
 });
 
-// Add subtle animation to the translation process
 function animateTranslation() {
     outputText.style.opacity = '0.5';
     setTimeout(() => {
@@ -56,12 +99,4 @@ function animateTranslation() {
 inputText.addEventListener('input', animateTranslation);
 targetLang.addEventListener('change', animateTranslation);
 
-// Greeting from the backend
-window.addEventListener('load', async () => {
-    try {
-        const greeting = await backend.greet('User');
-        console.log(greeting);
-    } catch (error) {
-        console.error('Error fetching greeting:', error);
-    }
-});
+window.addEventListener('load', initAuth);

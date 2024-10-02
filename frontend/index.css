@@ -33,6 +33,18 @@ h1 {
     margin-bottom: 2rem;
 }
 
+#authSection {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+#userSection {
+    font-size: 0.9rem;
+    color: var(--text-color);
+}
+
 .translator-box {
     display: flex;
     gap: 2rem;
@@ -96,6 +108,11 @@ button:active {
 
 #outputText {
     background-color: #f9f9f9;
+}
+
+#loginButton, #logoutButton {
+    width: auto;
+    padding: 0.5rem 1rem;
 }
 
 @media (max-width: 768px) {
