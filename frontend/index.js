@@ -45,6 +45,17 @@ speakButton.addEventListener('click', () => {
     speechSynthesis.speak(utterance);
 });
 
+// Add subtle animation to the translation process
+function animateTranslation() {
+    outputText.style.opacity = '0.5';
+    setTimeout(() => {
+        outputText.style.opacity = '1';
+    }, 300);
+}
+
+inputText.addEventListener('input', animateTranslation);
+targetLang.addEventListener('change', animateTranslation);
+
 // Greeting from the backend
 window.addEventListener('load', async () => {
     try {
